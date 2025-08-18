@@ -87,32 +87,9 @@ if rebuild:
     st.session_state.files_hash = current_hash
     st.success(f"Indexed {len(splits)} chunks from {len(uploaded_files)} file(s).")
 
-elif current_hash is None:
-    # No files: do not reset vectorstore/retriever; just leave them as-is
-    pass
-
-# ================== CHAINS ==================
-def get_session_history(session: str) -> BaseChatMessageHistory:
-    if session not in st.session_state.store:
-        st.session_state.store[session] = ChatMessageHistory()
-    return st.session_state.store[session]
-
-from chains import *
-
-if st.session_state.retriever is None:
-    core_chain,output_key=chain(llm)
-else:
-    core_chain,output_key=rag_chain(llm)
-
-conversational_chain = RunnableWithMessageHistory(
-    core_chain,
-    get_session_history,
-    input_messages_key="input",
-    history_messages_key="chat_history",
-    output_messages_key=output_key,
-)
-
-
+# elif current_hash is None:
+#     # No files: do not reset vectorstore/retriever; just leave them as-is
+#     pass
 
 # ================== SIDEBAR CONTROLS ==================
 def get_options():
@@ -161,7 +138,6 @@ with st.sidebar:
                 st.markdown(f"- {i}. [{role}] {snippet}")
     # st.write(f'{current_hash}')
 
-
 # ================== CHAT UI ==================
 st.divider()
 
@@ -169,29 +145,16 @@ with st.form("ask"):
     user_input = st.text_input("Your question:", key="user_input")
     submitted = st.form_submit_button("Submit")
 
+
 if submitted and user_input:
+    answer=main_chain(user_input)
     # Store user turn (newest-first UI)
     st.session_state.messages_display.insert(0, (user_input, ""))
-
-    # Invoke chain with consistent session_id
-    try:
-        raw = conversational_chain.invoke(
-            {"input": user_input},
-            config={"configurable": {"session_id": st.session_state.session_id}},
-        )
-
-        show_top_chunks_with_page(raw, title="Top retrieved chunks")
-        answer = extract_answer(raw)
-        st.session_state.messages_display[0] = (user_input, answer)
-
-    except Exception as e:
-        answer = f"[Error] {e}"
+    st.session_state.messages_display[0] = (user_input,answer)
 
 
 # Render transcript (newest first)
 for user_msg, bot_msg in st.session_state.messages_display:
-    st.markdown(f"**You:** {user_msg}")
-    st.markdown(f"**Assistant:** {bot_msg}")
-    st.markdown("---")
-
-
+    st.write(f"**You:** {user_msg}")
+    st.write(f"**Assistant:** \n {bot_msg}")
+    st.write("---")
