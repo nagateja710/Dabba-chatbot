@@ -13,7 +13,16 @@ from langchain_community.document_loaders import PyPDFLoader
 from langchain_huggingface import HuggingFaceEmbeddings
 
 embeddings = HuggingFaceEmbeddings(model_name="all-MiniLM-L6-v2")
-
+from PIL import Image 
+image = Image.open('icon.png') 
+st.set_page_config(
+    page_title="My Streamlit App",
+    page_icon=image  # Pass the PIL Image object
+    
+)
+st.logo(image,size='large')
+st.title("Dabba Chatbot")
+st.write("Multi‑Session Chat with Optional PDF RAG powered by LangChain’s message history")
 st.title("Dabba Chatbot")
 st.write("Multi‑Session Chat with Optional PDF RAG powered by LangChain’s message history")
 
@@ -185,3 +194,4 @@ for user_msg, bot_msg in st.session_state.messages_display:
     st.markdown(f"**You:** {user_msg}")
     st.markdown(f"**Assistant:** {bot_msg}")
     st.markdown("---")
+
