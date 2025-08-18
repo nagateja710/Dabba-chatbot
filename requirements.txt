@@ -1,9 +1,9 @@
 streamlit
 langchain-huggingface
-langchain-chroma
 python-dotenv
 langchain_community
 pypdf
 streamlit
 langchain_groq
 sentence-transformers
+faiss-cpu

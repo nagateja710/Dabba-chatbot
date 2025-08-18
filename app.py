@@ -3,7 +3,7 @@ import os
 import uuid
 import streamlit as st
 
-from langchain_chroma import Chroma
+from langchain.vectorstores import FAISS 
 from langchain_community.chat_message_histories import ChatMessageHistory
 from langchain_core.chat_history import BaseChatMessageHistory
 from langchain_core.runnables.history import RunnableWithMessageHistory
@@ -72,7 +72,7 @@ if rebuild:
 
     text_splitter = CharacterTextSplitter(chunk_size=1200, chunk_overlap=100)
     splits = text_splitter.split_documents(documents)
-    st.session_state.vectorstore = Chroma.from_documents(splits, embedding=embeddings)
+    st.session_state.vectorstore = FAISS.from_documents(splits, embedding=embeddings)
     st.session_state.retriever = st.session_state.vectorstore.as_retriever(
         search_kwargs={"k": 3}
     )
