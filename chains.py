@@ -9,6 +9,9 @@ from dotenv import load_dotenv
 import os
 import streamlit as st
 from langchain_groq import ChatGroq
+from langchain_community.chat_message_histories import ChatMessageHistory
+from langchain_core.chat_history import BaseChatMessageHistory
+from langchain_core.runnables.history import RunnableWithMessageHistory
 
 load_dotenv(dotenv_path="a.env")
 # GROQ_API_KEY = os.getenv("GROQ_API_KEY") #uncomment this and use
@@ -106,4 +109,5 @@ def main_chain(user_input):
   else:
     answer=rag_chain(user_input)
   return answer
+
 
