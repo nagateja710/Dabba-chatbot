@@ -1,4 +1,3 @@
-from utils import *
 from langchain_core.prompts import ChatPromptTemplate, MessagesPlaceholder
 from langchain.chains import (
     create_history_aware_retriever,
@@ -8,12 +7,12 @@ from langchain.chains import LLMChain
 from langchain.chains.combine_documents import create_stuff_documents_chain
 from dotenv import load_dotenv
 import os
+import streamlit as st
 from langchain_groq import ChatGroq
-# ================== SETUP ==================
-# DB_DIR = "./chroma_db"  # choose your directory
-# os.makedirs(DB_DIR, exist_ok=True)
+
 load_dotenv(dotenv_path="a.env")
-GROQ_API_KEY = os.getenv("GROQ_API_KEY")
+# GROQ_API_KEY = os.getenv("GROQ_API_KEY") #uncomment this and use
+GROQ_API_KEY=st.secrets['GROQ_API_KEY'] #comment this , iam using this for hoisiting the app
 
 
 
@@ -52,7 +51,6 @@ def rag_chain(llm):
     ])
     question_answer_chain = create_stuff_documents_chain(llm, qa_prompt)
     core_chain = create_retrieval_chain(history_aware_retriever, question_answer_chain)
-    # output_key = "answer"
     return core_chain,'answer'
 
 
@@ -65,6 +63,5 @@ def chain(llm):
         ]
     )
     core_chain = LLMChain(llm=llm, prompt=chat_prompt)
-    # output_key = "text"
     return core_chain,'text'
 
