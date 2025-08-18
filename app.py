@@ -44,6 +44,7 @@ if "files_hash" not in st.session_state:
     st.session_state.files_hash = None  # to rebuild KB only when uploads change
 
 from utils import *
+from chains import *
 
 bind_messages_display_to_current_session()
 
@@ -158,3 +159,4 @@ for user_msg, bot_msg in st.session_state.messages_display:
     st.write(f"**You:** {user_msg}")
     st.write(f"**Assistant:** \n {bot_msg}")
     st.write("---")
+
