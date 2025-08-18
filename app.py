@@ -3,7 +3,7 @@ import os
 import uuid
 import streamlit as st
 
-from langchain.vectorstores import FAISS 
+from langchain_community.vectorstores import FAISS
 from langchain_community.chat_message_histories import ChatMessageHistory
 from langchain_core.chat_history import BaseChatMessageHistory
 from langchain_core.runnables.history import RunnableWithMessageHistory
@@ -159,4 +159,5 @@ for user_msg, bot_msg in st.session_state.messages_display:
     st.write(f"**You:** {user_msg}")
     st.write(f"**Assistant:** \n {bot_msg}")
     st.write("---")
+
 
