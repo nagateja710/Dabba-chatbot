@@ -29,7 +29,12 @@ llm = ChatGroq(
     max_tokens=512,
 )
 
-def rag_chain(llm):
+def get_session_history(session: str) -> BaseChatMessageHistory:
+    if session not in st.session_state.store:
+        st.session_state.store[session] = ChatMessageHistory()
+    return st.session_state.store[session]
+
+def rag_chain(user_input):
     contextualize_prompt = ChatPromptTemplate.from_messages(
         [
             ("system", "Rewrite the latest question as standalone using chat history. Do not answer."),
@@ -51,10 +56,24 @@ def rag_chain(llm):
     ])
     question_answer_chain = create_stuff_documents_chain(llm, qa_prompt)
     core_chain = create_retrieval_chain(history_aware_retriever, question_answer_chain)
-    return core_chain,'answer'
+    output_key = "answer"
+    conversational_chain = RunnableWithMessageHistory(
+        core_chain,
+         get_session_history,
+        input_messages_key="input",
+        history_messages_key="chat_history",
+        output_messages_key=output_key,
+    )
+
+    res=conversational_chain.invoke(
+            {"input": user_input},
+            config={"configurable": {"session_id": st.session_state.session_id}},
+        )
+    # return core_chain,'answer'
+    return res['answer']
 
 
-def chain(llm):
+def chain(user_input):
     chat_prompt = ChatPromptTemplate.from_messages(
         [
             ("system", "Chat normally, considering prior messages."),
@@ -62,6 +81,29 @@ def chain(llm):
             ("human", "{input}"),
         ]
     )
-    core_chain = LLMChain(llm=llm, prompt=chat_prompt)
-    return core_chain,'text'
+    # core_chain = LLMChain(llm=llm, prompt=chat_prompt)
+    core_chain=chat_prompt | llm
+    output_key = "output"
+    conversational_chain = RunnableWithMessageHistory(
+        core_chain,
+         get_session_history,
+        input_messages_key="input",
+        history_messages_key="chat_history",
+        output_messages_key=output_key,
+    )
+
+    res=conversational_chain.invoke(
+            {"input": user_input},
+            config={"configurable": {"session_id": st.session_state.session_id}},
+    )
+
+    # return core_chain,'text'
+    return res.content
+
+def main_chain(user_input):
+  if st.session_state.retriever is None:
+    answer=chain(user_input)
+  else:
+    answer=rag_chain(user_input)
+  return answer
 
