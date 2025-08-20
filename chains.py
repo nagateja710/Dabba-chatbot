@@ -1,3 +1,4 @@
+from utils import show_top_chunks_with_page
 from langchain_core.prompts import ChatPromptTemplate, MessagesPlaceholder
 from langchain.chains import (
     create_history_aware_retriever,
@@ -9,13 +10,13 @@ from dotenv import load_dotenv
 import os
 import streamlit as st
 from langchain_groq import ChatGroq
+from langchain_core.runnables.history import RunnableWithMessageHistory
 from langchain_community.chat_message_histories import ChatMessageHistory
 from langchain_core.chat_history import BaseChatMessageHistory
-from langchain_core.runnables.history import RunnableWithMessageHistory
 
 load_dotenv(dotenv_path="a.env")
-# GROQ_API_KEY = os.getenv("GROQ_API_KEY") #uncomment this and use
-GROQ_API_KEY=st.secrets['GROQ_API_KEY'] #comment this , iam using this for hoisiting the app
+GROQ_API_KEY = os.getenv("GROQ_API_KEY")
+# GROQ_API_KEY=st.secrets['GROQ_API_KEY']
 
 
 
@@ -72,6 +73,7 @@ def rag_chain(user_input):
             {"input": user_input},
             config={"configurable": {"session_id": st.session_state.session_id}},
         )
+    show_top_chunks_with_page(res, title="Top retrieved chunks")
     # return core_chain,'answer'
     return res['answer']
 
@@ -99,7 +101,7 @@ def chain(user_input):
             {"input": user_input},
             config={"configurable": {"session_id": st.session_state.session_id}},
     )
-
+    
     # return core_chain,'text'
     return res.content
 
@@ -109,5 +111,4 @@ def main_chain(user_input):
   else:
     answer=rag_chain(user_input)
   return answer
-
 
