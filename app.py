@@ -1,4 +1,4 @@
-#paste it in test.py to test
+# ================== IMPORTING LIBRARIES ==================
 import os
 import uuid
 import streamlit as st
@@ -145,7 +145,6 @@ with st.form("ask"):
 
 if submitted and user_input:
     answer=main_chain(user_input)
-    # Store user turn (newest-first UI)
     st.session_state.messages_display.insert(0, (user_input, ""))
     st.session_state.messages_display[0] = (user_input,answer)
 
@@ -155,6 +154,7 @@ for user_msg, bot_msg in st.session_state.messages_display:
     st.write(f"**You:** {user_msg}")
     st.write(f"**Assistant:** \n {bot_msg}")
     st.write("---")
+
 
 
 
